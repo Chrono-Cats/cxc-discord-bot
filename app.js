@@ -88,13 +88,21 @@ async function main() {
   client.on('interactionCreate', async (interaction) => {
     switch (interaction.commandName) {
       case 'ask':
-        await interaction.reply({ content: "loading..." })
-        const question = interaction.options.getString('question')
-        const answer = await ask({
-          user: interaction.user.id,
-          question,
-        })
-        await interaction.editReply({ content: answer.choices[0].text })
+        try {
+          await interaction.reply({ content: "loading..." })
+          const question = interaction.options.getString('question')
+          const answer = await ask({
+            user: interaction.user.id,
+            question,
+          })
+          if (!answer?.choices[0]?.text) {
+            await interaction.editReply({ content: '抱歉我沒有這個問題的答案...' })
+          } else {
+            await interaction.editReply({ content: answer.choices[0].text })
+          }
+        } catch(e) {
+          await interaction.editReply({ content: '抱歉我目前不太方便回答你這個問題...' })
+        }
         break
     }
   })
